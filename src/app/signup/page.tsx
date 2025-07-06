@@ -7,6 +7,7 @@ import { z } from 'zod'
 import Link from 'next/link'
 import { useAuth } from '@/contexts/AuthContext'
 import { ROUTES, VIVVO } from '@/lib/constants'
+import Footer from '@/components/layout/Footer'
 
 const signupSchema = z.object({
   email: z.string().email('Email inválido'),
@@ -23,7 +24,7 @@ export default function SignupPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
-  const { signUp, signInWithGoogle } = useAuth()
+  const { signUp } = useAuth()
   
   const {
     register,
@@ -52,22 +53,23 @@ export default function SignupPage() {
     }
   }
 
-  const handleGoogleSignUp = async () => {
-    setIsLoading(true)
-    setError(null)
+  // Google Sign Up - Currently disabled
+  // const handleGoogleSignUp = async () => {
+  //   setIsLoading(true)
+  //   setError(null)
 
-    try {
-      const { error } = await signInWithGoogle()
+  //   try {
+  //     const { error } = await signInWithGoogle()
       
-      if (error) {
-        setError(error.message)
-      }
-    } catch {
-      setError('Error al registrarse con Google.')
-    } finally {
-      setIsLoading(false)
-    }
-  }
+  //     if (error) {
+  //       setError(error.message)
+  //     }
+  //   } catch {
+  //     setError('Error al registrarse con Google.')
+  //   } finally {
+  //     setIsLoading(false)
+  //   }
+  // }
 
   if (success) {
     return (
@@ -101,7 +103,8 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <>
+      <div className="min-h-screen bg-gray-50 flex">
       {/* Left Column - Benefits */}
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-green-600 to-green-800 p-12 items-center">
         <div className="max-w-md text-white pl-8">
@@ -285,5 +288,8 @@ export default function SignupPage() {
         </div>
       </div>
     </div>
+    
+    <Footer />
+  </>
   )
 } 

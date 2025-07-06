@@ -7,6 +7,7 @@ import { z } from 'zod'
 import Link from 'next/link'
 import { useAuth } from '@/contexts/AuthContext'
 import { ROUTES, VIVVO } from '@/lib/constants'
+import Footer from '@/components/layout/Footer'
 
 const loginSchema = z.object({
   email: z.string().email('Email inválido'),
@@ -18,7 +19,7 @@ type LoginForm = z.infer<typeof loginSchema>
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const { signIn, signInWithGoogle } = useAuth()
+  const { signIn } = useAuth()
   
   const {
     register,
@@ -46,25 +47,27 @@ export default function LoginPage() {
     }
   }
 
-  const handleGoogleSignIn = async () => {
-    setIsLoading(true)
-    setError(null)
+  // Google Sign In - Currently disabled
+  // const handleGoogleSignIn = async () => {
+  //   setIsLoading(true)
+  //   setError(null)
 
-    try {
-      const { error } = await signInWithGoogle()
+  //   try {
+  //     const { error } = await signInWithGoogle()
       
-      if (error) {
-        setError(error.message)
-      }
-    } catch {
-      setError('Error al iniciar sesión con Google.')
-    } finally {
-      setIsLoading(false)
-    }
-  }
+  //     if (error) {
+  //       setError(error.message)
+  //     }
+  //   } catch {
+  //     setError('Error al iniciar sesión con Google.')
+  //   } finally {
+  //     setIsLoading(false)
+  //   }
+  // }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <>
+      <div className="min-h-screen bg-gray-50 flex">
       {/* Left Column - Benefits */}
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-600 to-blue-800 p-12 items-center">
         <div className="max-w-md text-white">
@@ -230,5 +233,8 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+    
+    <Footer />
+  </>
   )
 } 

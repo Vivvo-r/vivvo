@@ -8,6 +8,7 @@ import { Building, Review } from '@/types'
 import { ROUTES } from '@/lib/constants'
 import { useAuth } from '@/contexts/AuthContext'
 import Header from '@/components/layout/Header'
+import Footer from '@/components/layout/Footer'
 
 export default function BuildingDetailPage() {
   const params = useParams()
@@ -19,6 +20,7 @@ export default function BuildingDetailPage() {
   const [reviews, setReviews] = useState<Review[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [expandedReview, setExpandedReview] = useState<string | null>(null)
 
   useEffect(() => {
     fetchBuildingData()
@@ -59,6 +61,8 @@ export default function BuildingDetailPage() {
         setReviews(reviewsData || [])
       }
 
+
+
     } catch {
       setError('Error al cargar la información del edificio')
     } finally {
@@ -72,12 +76,82 @@ export default function BuildingDetailPage() {
     return Math.round((sum / reviews.length) * 10) / 10
   }
 
-  const renderStars = (rating: number) => {
+  const renderStars = (rating: number, size: string = 'text-lg') => {
     return Array.from({ length: 5 }, (_, i) => (
-      <span key={i} className={`text-lg ${i < rating ? 'text-yellow-400' : 'text-gray-300'}`}>
+      <span key={i} className={`${size} ${i < rating ? 'text-yellow-400' : 'text-gray-300'}`}>
         ★
       </span>
     ))
+  }
+
+  const renderDetailedRatings = (review: Review) => {
+    const categories = [
+      { key: 'rating_building_condition', label: 'Condición del edificio', icon: '🏢' },
+      { key: 'rating_security', label: 'Seguridad', icon: '🔐' },
+      { key: 'rating_noise_level', label: 'Nivel de ruido', icon: '🔇' },
+      { key: 'rating_public_transport', label: 'Transporte público', icon: '🚌' },
+      { key: 'rating_shopping_centers', label: 'Centros comerciales', icon: '🛒' },
+      { key: 'rating_hospitals', label: 'Hospitales', icon: '🏥' },
+      { key: 'rating_gym', label: 'Gimnasios', icon: '💪' },
+      { key: 'rating_administration', label: 'Administración', icon: '👥' },
+      { key: 'rating_maintenance', label: 'Mantenimiento', icon: '🔧' },
+      { key: 'rating_location', label: 'Ubicación', icon: '📍' },
+      { key: 'rating_apartment_quality', label: 'Calidad del apartamento', icon: '🏠' },
+      { key: 'rating_amenities', label: 'Amenidades', icon: '🌊' }
+    ]
+
+    const ratingsWithValues = categories.filter(cat => {
+      const value = review[cat.key as keyof Review] as number
+      return value && value > 0
+    })
+
+    if (ratingsWithValues.length === 0) return null
+
+    return (
+      <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+        <h4 className="font-medium text-gray-900 mb-4">Calificaciones Detalladas</h4>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          {ratingsWithValues.map(category => {
+            const rating = review[category.key as keyof Review] as number
+            return (
+              <div key={category.key} className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm">{category.icon}</span>
+                  <span className="text-sm text-gray-700">{category.label}</span>
+                </div>
+                <div className="flex items-center space-x-1">
+                  {renderStars(rating, 'text-sm')}
+                  <span className="text-sm text-gray-600 ml-1">({rating})</span>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+    )
+  }
+
+  const getApartmentTypeLabel = (type: string) => {
+    const types: { [key: string]: string } = {
+      'studio': 'Studio',
+      '1br': '1 recámara',
+      '2br': '2 recámaras', 
+      '3br': '3 recámaras',
+      'penthouse': 'Penthouse'
+    }
+    return types[type] || type
+  }
+
+  const getRentRangeLabel = (range: string) => {
+    const ranges: { [key: string]: string } = {
+      'under_500': 'Menos de $500',
+      '500_1000': '$500 - $1,000',
+      '1000_1500': '$1,000 - $1,500',
+      '1500_2000': '$1,500 - $2,000',
+      '2000_3000': '$2,000 - $3,000',
+      'over_3000': 'Más de $3,000'
+    }
+    return ranges[range] || range
   }
 
   const handleWriteReview = () => {
@@ -344,6 +418,8 @@ export default function BuildingDetailPage() {
         {/* Content Section */}
         <div className="py-8">
           <div className="space-y-8">
+
+
             {/* Building Info */}
             <div>
               <h2 className="text-2xl font-semibold text-gray-900 mb-4">
@@ -449,9 +525,136 @@ export default function BuildingDetailPage() {
                               {renderStars(review.rating)}
                             </div>
                             
+                            {/* Título del review si existe */}
+                            {review.review_title && (
+                              <h5 className="font-medium text-gray-900 mb-2">{review.review_title}</h5>
+                            )}
+                            
                             <p className={`text-gray-700 leading-relaxed ${isBlurred ? 'filter blur-sm' : ''}`}>
                               {review.comment}
                             </p>
+                            
+                            {/* Información adicional básica */}
+                            <div className="mt-3 flex flex-wrap gap-2 text-sm text-gray-600">
+                              {review.apartment_type && (
+                                <span className="bg-gray-100 px-2 py-1 rounded-full">
+                                  {getApartmentTypeLabel(review.apartment_type)}
+                                </span>
+                              )}
+                              {review.monthly_rent_range && (
+                                <span className="bg-gray-100 px-2 py-1 rounded-full">
+                                  {getRentRangeLabel(review.monthly_rent_range)}
+                                </span>
+                              )}
+                              {review.living_duration_months && (
+                                <span className="bg-gray-100 px-2 py-1 rounded-full">
+                                  Vivió {review.living_duration_months} meses
+                                </span>
+                              )}
+                            </div>
+                            
+                            {/* Botón para expandir/contraer */}
+                            <div className="mt-4 flex items-center justify-between">
+                              <button
+                                onClick={() => setExpandedReview(expandedReview === review.id ? null : review.id)}
+                                className="text-sm text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1"
+                              >
+                                {expandedReview === review.id ? (
+                                  <>
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                                    </svg>
+                                    Ver menos
+                                  </>
+                                ) : (
+                                  <>
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                    Ver detalles completos
+                                  </>
+                                )}
+                              </button>
+                              
+                              {review.would_recommend !== undefined && (
+                                <span className={`text-sm px-3 py-1 rounded-full ${
+                                  review.would_recommend 
+                                    ? 'bg-green-100 text-green-800' 
+                                    : 'bg-red-100 text-red-800'
+                                }`}>
+                                  {review.would_recommend ? '✓ Recomendado' : '✗ No recomendado'}
+                                </span>
+                              )}
+                            </div>
+                            
+                            {/* Contenido expandido */}
+                            {expandedReview === review.id && (
+                              <div className="mt-6 border-t pt-6">
+                                {/* Pros y Contras */}
+                                {(review.pros || review.cons) && (
+                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                    {review.pros && (
+                                      <div>
+                                        <h5 className="font-medium text-green-700 mb-3 flex items-center gap-2">
+                                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                          </svg>
+                                          Lo mejor
+                                        </h5>
+                                        <p className="text-sm text-gray-700 leading-relaxed">{review.pros}</p>
+                                      </div>
+                                    )}
+                                    {review.cons && (
+                                      <div>
+                                        <h5 className="font-medium text-red-700 mb-3 flex items-center gap-2">
+                                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                          </svg>
+                                          Lo peor
+                                        </h5>
+                                        <p className="text-sm text-gray-700 leading-relaxed">{review.cons}</p>
+                                      </div>
+                                    )}
+                                  </div>
+                                )}
+                                
+                                {/* Calificaciones detalladas */}
+                                {renderDetailedRatings(review)}
+                                
+                                {/* Información adicional */}
+                                <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+                                  <h5 className="font-medium text-gray-900 mb-3">Información adicional</h5>
+                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                                    {review.apartment_type && (
+                                      <div className="flex items-center gap-2">
+                                        <span className="text-gray-500">Tipo de apartamento:</span>
+                                        <span className="font-medium">{getApartmentTypeLabel(review.apartment_type)}</span>
+                                      </div>
+                                    )}
+                                    {review.monthly_rent_range && (
+                                      <div className="flex items-center gap-2">
+                                        <span className="text-gray-500">Rango de alquiler:</span>
+                                        <span className="font-medium">{getRentRangeLabel(review.monthly_rent_range)}</span>
+                                      </div>
+                                    )}
+                                    {review.living_duration_months && (
+                                      <div className="flex items-center gap-2">
+                                        <span className="text-gray-500">Tiempo vivido:</span>
+                                        <span className="font-medium">{review.living_duration_months} meses</span>
+                                      </div>
+                                    )}
+                                    {review.would_recommend !== undefined && (
+                                      <div className="flex items-center gap-2">
+                                        <span className="text-gray-500">¿Lo recomendaría?</span>
+                                        <span className={`font-medium ${review.would_recommend ? 'text-green-600' : 'text-red-600'}`}>
+                                          {review.would_recommend ? 'Sí' : 'No'}
+                                        </span>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            )}
                           </div>
 
                           {/* Blur overlay for non-logged users */}
@@ -516,6 +719,8 @@ export default function BuildingDetailPage() {
           </div>
         </div>
       </div>
+      
+      <Footer />
     </div>
   )
 } 

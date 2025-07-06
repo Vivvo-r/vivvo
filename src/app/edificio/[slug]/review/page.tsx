@@ -8,6 +8,7 @@ import { Building } from '@/types'
 import { ROUTES } from '@/lib/constants'
 import { useAuth } from '@/contexts/AuthContext'
 import Header from '@/components/layout/Header'
+import Footer from '@/components/layout/Footer'
 
 export default function WriteReviewPage() {
   const params = useParams()
@@ -25,6 +26,33 @@ export default function WriteReviewPage() {
   const [rating, setRating] = useState(0)
   const [hoverRating, setHoverRating] = useState(0)
   const [comment, setComment] = useState('')
+  
+  // Detailed ratings
+  const [detailedRatings, setDetailedRatings] = useState({
+    building_condition: 0,
+    security: 0,
+    noise_level: 0,
+    public_transport: 0,
+    shopping_centers: 0,
+    hospitals: 0,
+    gym: 0,
+    administration: 0,
+    maintenance: 0,
+    location: 0,
+    apartment_quality: 0,
+    amenities: 0
+  })
+  
+  // Additional form fields
+  const [reviewTitle, setReviewTitle] = useState('')
+  const [pros, setPros] = useState('')
+  const [cons, setCons] = useState('')
+  const [livingDuration, setLivingDuration] = useState('')
+  const [apartmentType, setApartmentType] = useState('')
+  const [rentRange, setRentRange] = useState('')
+  const [wouldRecommend, setWouldRecommend] = useState<boolean | null>(null)
+  
+  const [showDetailedRatings, setShowDetailedRatings] = useState(false)
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -90,8 +118,15 @@ export default function WriteReviewPage() {
         return
       }
 
-      // Insert new review
-      const { error: insertError } = await supabase
+      // Insert new review - Start with basic fields first
+      console.log('Attempting to insert review with data:', {
+        building_id: building.id,
+        user_id: user.id,
+        rating,
+        comment: comment.trim()
+      })
+
+      const { data: insertData, error: insertError } = await supabase
         .from('reviews')
         .insert({
           building_id: building.id,
@@ -99,10 +134,15 @@ export default function WriteReviewPage() {
           rating,
           comment: comment.trim()
         })
+        .select()
+
+      console.log('Insert result:', { data: insertData, error: insertError })
 
       if (insertError) {
-        setError('Error al guardar la reseña')
+        console.error('Insert error details:', insertError)
+        setError(`Error al guardar la reseña: ${insertError.message}`)
       } else {
+        console.log('Review saved successfully:', insertData)
         setSuccess(true)
         // Redirect to building page after 2 seconds
         setTimeout(() => {
@@ -131,6 +171,27 @@ export default function WriteReviewPage() {
           className={`text-3xl transition-colors ${
             interactive ? 'hover:scale-110 cursor-pointer' : 'cursor-default'
           } ${
+            filled ? 'text-yellow-400' : 'text-gray-300'
+          }`}
+        >
+          ★
+        </button>
+      )
+    })
+  }
+
+  const renderDetailedStars = (category: string, currentRating: number, hoverRating: number) => {
+    return Array.from({ length: 5 }, (_, i) => {
+      const filled = i < (hoverRating || currentRating)
+      
+      return (
+        <button
+          key={i}
+          type="button"
+          onClick={() => setDetailedRatings(prev => ({ ...prev, [category]: i + 1 }))}
+          onMouseEnter={() => setHoverRating(i + 1)}
+          onMouseLeave={() => setHoverRating(0)}
+          className={`text-xl transition-colors hover:scale-110 cursor-pointer ${
             filled ? 'text-yellow-400' : 'text-gray-300'
           }`}
         >
@@ -381,18 +442,270 @@ export default function WriteReviewPage() {
                 </div>
               </div>
 
-              {/* Future: Categories Rating Section (Phase 2) */}
-              <div className="bg-gray-50 border border-gray-200 rounded-xl p-6">
-                <div className="text-center">
-                  <div className="w-12 h-12 mx-auto mb-3 bg-gray-200 rounded-full flex items-center justify-center">
-                    <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4" />
-                    </svg>
+              {/* Step 3: Detailed Ratings (Optional) */}
+              <div className="bg-white border border-gray-200 rounded-xl p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                      <span className="text-sm font-bold text-blue-600">3</span>
+                    </div>
+                    <h3 className="text-xl font-semibold text-gray-900">
+                      Calificaciones Detalladas (Opcional)
+                    </h3>
                   </div>
-                  <h4 className="font-medium text-gray-600 mb-2">🚀 Próximamente</h4>
-                  <p className="text-sm text-gray-500">
-                    Calificaciones detalladas por categorías (seguridad, amenidades, ubicación, etc.)
-                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setShowDetailedRatings(!showDetailedRatings)}
+                    className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                  >
+                    {showDetailedRatings ? 'Ocultar' : 'Mostrar'} detalles
+                  </button>
+                </div>
+
+                {showDetailedRatings && (
+                  <div className="space-y-4">
+                    <p className="text-gray-600 text-sm mb-6">
+                      Ayuda a otros residentes calificando aspectos específicos del edificio
+                    </p>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {/* Building & Physical */}
+                      <div>
+                        <h4 className="font-medium text-gray-900 mb-4">🏢 Edificio & Estructura</h4>
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm text-gray-700">Condición del edificio</span>
+                            <div className="flex items-center space-x-1">
+                              {renderDetailedStars('building_condition', detailedRatings.building_condition, 0)}
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm text-gray-700">Mantenimiento</span>
+                            <div className="flex items-center space-x-1">
+                              {renderDetailedStars('maintenance', detailedRatings.maintenance, 0)}
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm text-gray-700">Calidad del apartamento</span>
+                            <div className="flex items-center space-x-1">
+                              {renderDetailedStars('apartment_quality', detailedRatings.apartment_quality, 0)}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Security & Services */}
+                      <div>
+                        <h4 className="font-medium text-gray-900 mb-4">🔐 Seguridad & Servicios</h4>
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm text-gray-700">Seguridad</span>
+                            <div className="flex items-center space-x-1">
+                              {renderDetailedStars('security', detailedRatings.security, 0)}
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm text-gray-700">Administración</span>
+                            <div className="flex items-center space-x-1">
+                              {renderDetailedStars('administration', detailedRatings.administration, 0)}
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm text-gray-700">Amenidades</span>
+                            <div className="flex items-center space-x-1">
+                              {renderDetailedStars('amenities', detailedRatings.amenities, 0)}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Location & Environment */}
+                      <div>
+                        <h4 className="font-medium text-gray-900 mb-4">📍 Ubicación & Entorno</h4>
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm text-gray-700">Ubicación</span>
+                            <div className="flex items-center space-x-1">
+                              {renderDetailedStars('location', detailedRatings.location, 0)}
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm text-gray-700">Nivel de ruido</span>
+                            <div className="flex items-center space-x-1">
+                              {renderDetailedStars('noise_level', detailedRatings.noise_level, 0)}
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm text-gray-700">Transporte público</span>
+                            <div className="flex items-center space-x-1">
+                              {renderDetailedStars('public_transport', detailedRatings.public_transport, 0)}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Nearby Services */}
+                      <div>
+                        <h4 className="font-medium text-gray-900 mb-4">🏪 Servicios Cercanos</h4>
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm text-gray-700">Centros comerciales</span>
+                            <div className="flex items-center space-x-1">
+                              {renderDetailedStars('shopping_centers', detailedRatings.shopping_centers, 0)}
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm text-gray-700">Hospitales</span>
+                            <div className="flex items-center space-x-1">
+                              {renderDetailedStars('hospitals', detailedRatings.hospitals, 0)}
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm text-gray-700">Gimnasios</span>
+                            <div className="flex items-center space-x-1">
+                              {renderDetailedStars('gym', detailedRatings.gym, 0)}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Step 4: Additional Information */}
+              <div className="bg-white border border-gray-200 rounded-xl p-6">
+                <div className="flex items-center space-x-3 mb-6">
+                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                    <span className="text-sm font-bold text-blue-600">4</span>
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-900">
+                    Información Adicional (Opcional)
+                  </h3>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Título de tu review
+                    </label>
+                    <input
+                      type="text"
+                      value={reviewTitle}
+                      onChange={(e) => setReviewTitle(e.target.value)}
+                      placeholder="Ej: Excelente ubicación, pero ruidoso"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      ¿Cuánto tiempo viviste allí?
+                    </label>
+                    <select
+                      value={livingDuration}
+                      onChange={(e) => setLivingDuration(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    >
+                      <option value="">Seleccionar...</option>
+                      <option value="3">Menos de 6 meses</option>
+                      <option value="6">6 meses a 1 año</option>
+                      <option value="12">1 a 2 años</option>
+                      <option value="24">2 a 3 años</option>
+                      <option value="36">Más de 3 años</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Tipo de apartamento
+                    </label>
+                    <select
+                      value={apartmentType}
+                      onChange={(e) => setApartmentType(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    >
+                      <option value="">Seleccionar...</option>
+                      <option value="studio">Studio</option>
+                      <option value="1br">1 recámara</option>
+                      <option value="2br">2 recámaras</option>
+                      <option value="3br">3 recámaras</option>
+                      <option value="penthouse">Penthouse</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Rango de alquiler mensual
+                    </label>
+                    <select
+                      value={rentRange}
+                      onChange={(e) => setRentRange(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    >
+                      <option value="">Seleccionar...</option>
+                      <option value="under_500">Menos de $500</option>
+                      <option value="500_1000">$500 - $1,000</option>
+                      <option value="1000_1500">$1,000 - $1,500</option>
+                      <option value="1500_2000">$1,500 - $2,000</option>
+                      <option value="2000_3000">$2,000 - $3,000</option>
+                      <option value="over_3000">Más de $3,000</option>
+                    </select>
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Aspectos positivos
+                    </label>
+                    <textarea
+                      value={pros}
+                      onChange={(e) => setPros(e.target.value)}
+                      rows={3}
+                      placeholder="Ej: Buena ubicación, amenidades completas, administración eficiente..."
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Aspectos negativos
+                    </label>
+                    <textarea
+                      value={cons}
+                      onChange={(e) => setCons(e.target.value)}
+                      rows={3}
+                      placeholder="Ej: Ruido del tráfico, estacionamiento limitado, elevadores lentos..."
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-4">
+                      ¿Recomendarías este edificio?
+                    </label>
+                    <div className="flex items-center space-x-6">
+                      <label className="flex items-center space-x-2">
+                        <input
+                          type="radio"
+                          name="recommend"
+                          checked={wouldRecommend === true}
+                          onChange={() => setWouldRecommend(true)}
+                          className="text-blue-600"
+                        />
+                        <span className="text-sm text-gray-700">Sí, lo recomendaría</span>
+                      </label>
+                      <label className="flex items-center space-x-2">
+                        <input
+                          type="radio"
+                          name="recommend"
+                          checked={wouldRecommend === false}
+                          onChange={() => setWouldRecommend(false)}
+                          className="text-blue-600"
+                        />
+                        <span className="text-sm text-gray-700">No lo recomendaría</span>
+                      </label>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -454,6 +767,8 @@ export default function WriteReviewPage() {
           </div>
         )}
       </div>
+      
+      <Footer />
     </div>
   )
 } 

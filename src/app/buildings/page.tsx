@@ -4,18 +4,36 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import { Building } from '@/types'
-import { ROUTES, VIVVO } from '@/lib/constants'
+import { ROUTES } from '@/lib/constants'
 import Header from '@/components/layout/Header'
+import Footer from '@/components/layout/Footer'
+import { useSearchParams } from 'next/navigation'
+import { Suspense } from 'react'
 
-export default function BuildingsPage() {
+function BuildingsPageContent() {
   const [buildings, setBuildings] = useState<Building[]>([])
+  const [allBuildings, setAllBuildings] = useState<Building[]>([]) // Store all buildings for search
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [favorites, setFavorites] = useState<Set<string>>(new Set())
+  const [searchTerm, setSearchTerm] = useState('')
+  
+  const searchParams = useSearchParams()
+  const searchQuery = searchParams.get('search')
 
   useEffect(() => {
     fetchBuildings()
   }, [])
+
+  useEffect(() => {
+    if (searchQuery) {
+      setSearchTerm(searchQuery)
+      filterBuildings(searchQuery)
+    } else {
+      setSearchTerm('')
+      setBuildings(allBuildings)
+    }
+  }, [searchQuery, allBuildings])
 
   const fetchBuildings = async () => {
     try {
@@ -27,6 +45,7 @@ export default function BuildingsPage() {
       if (error) {
         setError(error.message)
       } else {
+        setAllBuildings(data || [])
         setBuildings(data || [])
       }
     } catch {
@@ -34,6 +53,21 @@ export default function BuildingsPage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  const filterBuildings = (query: string) => {
+    if (!query.trim()) {
+      setBuildings(allBuildings)
+      return
+    }
+
+    const filtered = allBuildings.filter(building =>
+      building.name.toLowerCase().includes(query.toLowerCase()) ||
+      building.neighborhood.toLowerCase().includes(query.toLowerCase()) ||
+      building.corregimiento.toLowerCase().includes(query.toLowerCase()) ||
+      building.address.toLowerCase().includes(query.toLowerCase())
+    )
+    setBuildings(filtered)
   }
 
   const toggleFavorite = (buildingId: string) => {
@@ -48,13 +82,7 @@ export default function BuildingsPage() {
     })
   }
 
-  const renderStars = (rating: number) => {
-    return Array.from({ length: 5 }, (_, i) => (
-      <span key={i} className={`text-sm ${i < rating ? 'text-yellow-400' : 'text-gray-300'}`}>
-        ★
-      </span>
-    ))
-  }
+
 
   if (loading) {
     return (
@@ -83,20 +111,30 @@ export default function BuildingsPage() {
     )
   }
 
-  return (
-    <div className="min-h-screen bg-white">
-      <Header />
+      return (
+      <div className="min-h-screen bg-white">
+        <Header />
       
       {/* Page Header */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Edificios en Panamá
+              {searchTerm ? `Búsqueda: "${searchTerm}"` : 'Edificios en Panamá'}
             </h1>
             <p className="text-gray-600">
-              {buildings.length} edificios disponibles para revisar
+              {buildings.length} edificios {searchTerm ? 'encontrados' : 'disponibles'}
             </p>
+            {searchTerm && (
+              <div className="mt-4">
+                <Link
+                  href="/buildings"
+                  className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                >
+                  ← Ver todos los edificios
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -111,11 +149,22 @@ export default function BuildingsPage() {
               </svg>
             </div>
             <h3 className="text-xl font-semibold text-gray-900 mb-2">
-              No hay edificios disponibles
+              {searchTerm ? 'No se encontraron edificios' : 'No hay edificios disponibles'}
             </h3>
             <p className="text-gray-600 mb-6">
-              ¡Vuelve pronto para ver las nuevas opciones!
+              {searchTerm 
+                ? 'Prueba con otros términos de búsqueda o revisa todos los edificios disponibles.'
+                : '¡Vuelve pronto para ver las nuevas opciones!'
+              }
             </p>
+            {searchTerm && (
+              <Link
+                href="/buildings"
+                className="inline-flex items-center px-4 py-2 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors"
+              >
+                Ver todos los edificios
+              </Link>
+            )}
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -223,6 +272,23 @@ export default function BuildingsPage() {
           </div>
         </div>
       </div>
+      
+      <Footer />
     </div>
+  )
+}
+
+export default function BuildingsPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Cargando edificios...</p>
+        </div>
+      </div>
+    }>
+      <BuildingsPageContent />
+    </Suspense>
   )
 } 
