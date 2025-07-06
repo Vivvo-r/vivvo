@@ -10,4 +10,6 @@ export const ROUTES = {
   signup: '/signup',
   buildings: '/buildings',
   building: (slug: string) => `/edificio/${slug}`,
+  writeReview: (slug: string) => `/edificio/${slug}/review`,
+  suggestBuilding: '/suggest-building',
 } as const 
