@@ -1,36 +1,121 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🏢 Vivvo - Apartment Reviews Platform
 
-## Getting Started
+**Vivvo** is a web platform for apartment reviews in Panama. Find and review the best apartments in the city.
 
-First, run the development server:
+## 🚀 Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **User Authentication** - Sign up and login with Supabase
+- **Building Directory** - Browse available buildings
+- **Review System** - (Coming soon) Rate and review apartments
+- **Responsive Design** - Works on desktop and mobile
+
+## 🛠️ Tech Stack
+
+- **Frontend**: Next.js 15 + TypeScript
+- **Styling**: Tailwind CSS
+- **Database**: Supabase
+- **Forms**: React Hook Form + Zod
+- **Authentication**: Supabase Auth
+
+## 📦 Installation
+
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Set up environment variables:
+   ```bash
+   cp .env.example .env.local
+   ```
+   Then edit `.env.local` with your Supabase credentials:
+   ```
+   NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+   ```
+
+4. Run the development server:
+   ```bash
+   npm run dev
+   ```
+
+## 🗄️ Database Setup
+
+Create the following tables in your Supabase database:
+
+### Buildings table:
+```sql
+create table buildings (
+  id uuid default gen_random_uuid() primary key,
+  name text not null,
+  slug text unique not null,
+  address text not null,
+  neighborhood text not null,
+  created_at timestamp with time zone default now()
+);
+
+alter table buildings enable row level security;
+create policy "Buildings viewable by everyone" on buildings for select using (true);
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Reviews table:
+```sql
+create table reviews (
+  id uuid default gen_random_uuid() primary key,
+  building_id uuid references buildings(id) not null,
+  user_id uuid references auth.users(id) not null,
+  rating integer check (rating >= 1 and rating <= 5) not null,
+  comment text not null,
+  created_at timestamp with time zone default now()
+);
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+alter table reviews enable row level security;
+create policy "Reviews viewable by everyone" on reviews for select using (true);
+create policy "Users can insert reviews" on reviews for insert with check (auth.uid() = user_id);
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🌟 Current Pages
 
-## Learn More
+- **Homepage** (`/`) - Landing page with navigation
+- **Buildings** (`/buildings`) - List of available buildings
+- **Login** (`/login`) - User authentication
+- **Signup** (`/signup`) - User registration
 
-To learn more about Next.js, take a look at the following resources:
+## 🔧 Development
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+# Development server
+npm run dev
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# Build for production
+npm run build
 
-## Deploy on Vercel
+# Start production server
+npm start
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+# Run linter
+npm run lint
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 📱 Deployment
+
+The app is ready to deploy to Vercel:
+
+1. Push your code to GitHub
+2. Connect your GitHub repository to Vercel
+3. Add your environment variables in Vercel dashboard
+4. Deploy!
+
+## 🎯 Next Steps
+
+- [ ] Individual building pages
+- [ ] Review submission form
+- [ ] User profiles
+- [ ] Building image uploads
+- [ ] Search functionality
+- [ ] Maps integration
+
+---
+
+**Made with ❤️ for Panama's apartment hunters**
