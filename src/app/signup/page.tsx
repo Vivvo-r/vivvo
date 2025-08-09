@@ -73,7 +73,7 @@ export default function SignupPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 pixel-background flex items-center justify-center">
         <div className="max-w-md mx-auto">
           <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
             <div className="text-center">
@@ -104,7 +104,7 @@ export default function SignupPage() {
 
   return (
     <>
-      <div className="min-h-screen bg-gray-50 flex">
+      <div className="min-h-screen bg-gray-50 pixel-background flex">
       {/* Left Column - Benefits */}
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-green-600 to-green-800 p-12 items-center">
         <div className="max-w-md text-white pl-8">

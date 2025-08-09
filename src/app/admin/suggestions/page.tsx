@@ -69,6 +69,56 @@ export default function AdminSuggestionsPage() {
     await updateSuggestionStatus(suggestion.id, newStatus, notes)
   }
 
+  const convertToBuilding = async (suggestion: BuildingSuggestion) => {
+    if (!confirm(`¿Convertir "${suggestion.building_name}" en edificio oficial?`)) {
+      return
+    }
+
+    try {
+      // Generate slug
+      const slug = suggestion.building_name
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+
+      // Create building
+      const { data: newBuilding, error: buildingError } = await supabase
+        .from('buildings')
+        .insert({
+          name: suggestion.building_name,
+          slug,
+          address: suggestion.building_address,
+          neighborhood: suggestion.neighborhood,
+          corregimiento: suggestion.corregimiento || suggestion.neighborhood,
+          developer: suggestion.developer || null,
+          year_built: suggestion.year_built || null,
+          description: suggestion.additional_info || null,
+          // Default amenities - can be edited later
+          parking: false,
+          pool: false,
+          gym: false,
+          security_24_7: false,
+          elevator: false,
+          balcony: false
+        })
+        .select()
+        .single()
+
+      if (buildingError) throw buildingError
+
+      // Update suggestion status
+      await updateSuggestionStatus(suggestion.id, 'approved', 'Convertido a edificio oficial')
+
+      alert(`✅ Edificio "${newBuilding.name}" creado exitosamente!`)
+      
+    } catch (error) {
+      console.error('Error converting suggestion to building:', error)
+      alert('Error al convertir la sugerencia en edificio')
+    }
+  }
+
   const filteredSuggestions = suggestions.filter(suggestion => {
     if (filter === 'all') return true
     return suggestion.status === filter
@@ -230,7 +280,7 @@ export default function AdminSuggestionsPage() {
                     <div className="flex-1">
                       <div className="flex items-center space-x-3 mb-3">
                         <h3 className="text-lg font-medium text-gray-900">
-                          {suggestion.name}
+                          {suggestion.building_name}
                         </h3>
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(suggestion.status)}`}>
                           {getStatusText(suggestion.status)}
@@ -240,10 +290,10 @@ export default function AdminSuggestionsPage() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                         <div>
                           <p className="text-sm text-gray-600">
-                            <span className="font-medium">Ubicación:</span> {suggestion.location}
+                            <span className="font-medium">Ubicación:</span> {suggestion.building_address}
                           </p>
                           <p className="text-sm text-gray-600">
-                            <span className="font-medium">Email:</span> {suggestion.email}
+                            <span className="font-medium">Email:</span> {suggestion.submitter_email}
                           </p>
                           <p className="text-sm text-gray-600">
                             <span className="font-medium">Fecha:</span> {new Date(suggestion.created_at || '').toLocaleDateString()}
@@ -284,6 +334,12 @@ export default function AdminSuggestionsPage() {
                             Revisar
                           </button>
                           <button
+                            onClick={() => convertToBuilding(suggestion)}
+                            className="px-3 py-1 text-sm bg-purple-100 text-purple-800 rounded-md hover:bg-purple-200 transition-colors"
+                          >
+                            Crear Edificio
+                          </button>
+                          <button
                             onClick={() => handleStatusChange(suggestion, 'approved')}
                             className="px-3 py-1 text-sm bg-green-100 text-green-800 rounded-md hover:bg-green-200 transition-colors"
                           >
@@ -300,6 +356,12 @@ export default function AdminSuggestionsPage() {
 
                       {suggestion.status === 'reviewing' && (
                         <>
+                          <button
+                            onClick={() => convertToBuilding(suggestion)}
+                            className="px-3 py-1 text-sm bg-purple-100 text-purple-800 rounded-md hover:bg-purple-200 transition-colors"
+                          >
+                            Crear Edificio
+                          </button>
                           <button
                             onClick={() => handleStatusChange(suggestion, 'approved')}
                             className="px-3 py-1 text-sm bg-green-100 text-green-800 rounded-md hover:bg-green-200 transition-colors"

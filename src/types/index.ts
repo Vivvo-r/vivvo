@@ -3,19 +3,34 @@ export interface Building {
   name: string
   slug: string
   address: string
-  neighborhood: string
   corregimiento: string
   description?: string
   amenities?: string[]
   year_built?: number
   floors?: number
   apartments_count?: number
+  // Developer/Constructor info
+  developer?: string
+  // Photo management
+  photos?: string[] // URLs de las fotos
+  main_photo?: string // URL de la foto principal
+  // Amenities
   parking?: boolean
   pool?: boolean
   gym?: boolean
   security_24_7?: boolean
   elevator?: boolean
   balcony?: boolean
+  // Additional amenities
+  playground?: boolean
+  social_area?: boolean
+  concierge?: boolean
+  // Count fields
+  elevator_count?: number
+  pool_count?: number
+  // Calculated fields (from reviews)
+  average_rating?: number
+  total_reviews?: number
   created_at?: string
   updated_at?: string
 }
@@ -24,9 +39,9 @@ export interface Review {
   id: string
   building_id: string
   user_id: string
-  rating: number
+  overall_rating: number // Rating principal (1-5)
   comment: string
-  // Ratings detalladas
+  // Ratings detalladas (1-5)
   rating_building_condition?: number
   rating_security?: number
   rating_noise_level?: number
@@ -67,12 +82,17 @@ export interface Corregimiento {
 
 export interface BuildingSuggestion {
   id: string
-  name: string
-  location: string
-  email: string
+  building_name: string
+  building_address: string
+  corregimiento: string
+  submitter_email: string
+  submitter_name?: string
   additional_info?: string
   status: 'pending' | 'reviewing' | 'approved' | 'rejected'
   admin_notes?: string
+  // Campos opcionales de info del edificio
+  developer?: string
+  year_built?: number
   created_at?: string
   updated_at?: string
 }

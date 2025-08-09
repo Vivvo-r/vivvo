@@ -72,7 +72,7 @@ export default function BuildingDetailPage() {
 
   const calculateAverageRating = () => {
     if (reviews.length === 0) return 0
-    const sum = reviews.reduce((acc, review) => acc + review.rating, 0)
+    const sum = reviews.reduce((acc, review) => acc + review.overall_rating, 0)
     return Math.round((sum / reviews.length) * 10) / 10
   }
 
@@ -194,7 +194,7 @@ export default function BuildingDetailPage() {
   const averageRating = calculateAverageRating()
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gray-50 pixel-background">
       <Header />
       
       {/* Breadcrumb */}
@@ -252,27 +252,80 @@ export default function BuildingDetailPage() {
             {/* Images Column */}
             <div className="lg:col-span-2 space-y-4">
               {/* Main Image */}
-              <div className="aspect-[3/2] rounded-lg overflow-hidden bg-gradient-to-br from-blue-400 via-blue-500 to-blue-600 flex items-center justify-center">
-                <div className="text-center text-white">
-                  <svg className="w-12 h-12 mx-auto mb-2 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H9m11 0v-5a2 2 0 00-2-2h-2a2 2 0 00-2 2v5m-4 0V9a2 2 0 012-2h2a2 2 0 012 2v12m-6 0h4" />
-                  </svg>
-                  <p className="text-sm font-medium">Vista Principal</p>
-                </div>
+              <div className="aspect-[3/2] rounded-lg overflow-hidden">
+                {building.main_photo || (building.photos && building.photos.length > 0) ? (
+                  <>
+                    <img 
+                      src={building.main_photo || building.photos![0]} 
+                      alt={`${building.name} - Vista Principal`}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.style.display = 'none';
+                        target.nextElementSibling!.classList.remove('hidden');
+                      }}
+                    />
+                    <div className="hidden w-full h-full bg-gradient-to-br from-blue-400 via-blue-500 to-blue-600 flex items-center justify-center">
+                      <div className="text-center text-white">
+                        <svg className="w-12 h-12 mx-auto mb-2 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H9m11 0v-5a2 2 0 00-2-2h-2a2 2 0 00-2 2v5m-4 0V9a2 2 0 012-2h2a2 2 0 012 2v12m-6 0h4" />
+                        </svg>
+                        <p className="text-sm font-medium">Vista Principal</p>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-blue-400 via-blue-500 to-blue-600 flex items-center justify-center">
+                    <div className="text-center text-white">
+                      <svg className="w-12 h-12 mx-auto mb-2 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H9m11 0v-5a2 2 0 00-2-2h-2a2 2 0 00-2 2v5m-4 0V9a2 2 0 012-2h2a2 2 0 012 2v12m-6 0h4" />
+                      </svg>
+                      <p className="text-sm font-medium">Vista Principal</p>
+                    </div>
+                  </div>
+                )}
               </div>
               
               {/* Secondary Images - Scrollable */}
               <div className="flex gap-3 overflow-x-auto pb-2">
-                {[1, 2, 3, 4, 5, 6].map((i) => (
-                  <div key={i} className="flex-shrink-0 w-32 h-32 rounded-lg overflow-hidden bg-gradient-to-br from-gray-400 via-gray-500 to-gray-600 flex items-center justify-center">
-                    <div className="text-center text-white">
-                      <svg className="w-6 h-6 mx-auto mb-1 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                      <p className="text-xs">Foto {i}</p>
+                {building.photos && building.photos.length > 0 ? (
+                  building.photos.slice(1).map((photo, i) => (
+                    <div key={i} className="flex-shrink-0 w-32 h-32 rounded-lg overflow-hidden">
+                      <>
+                        <img 
+                          src={photo} 
+                          alt={`${building.name} - Foto ${i + 2}`}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                            target.nextElementSibling!.classList.remove('hidden');
+                          }}
+                        />
+                        <div className="hidden w-full h-full bg-gradient-to-br from-gray-400 via-gray-500 to-gray-600 flex items-center justify-center">
+                          <div className="text-center text-white">
+                            <svg className="w-6 h-6 mx-auto mb-1 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            <p className="text-xs">Foto {i + 2}</p>
+                          </div>
+                        </div>
+                      </>
                     </div>
-                  </div>
-                ))}
+                  ))
+                ) : (
+                  // Fallback placeholder images when no photos are available
+                  [1, 2, 3, 4, 5].map((i) => (
+                    <div key={i} className="flex-shrink-0 w-32 h-32 rounded-lg overflow-hidden bg-gradient-to-br from-gray-400 via-gray-500 to-gray-600 flex items-center justify-center">
+                      <div className="text-center text-white">
+                        <svg className="w-6 h-6 mx-auto mb-1 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        <p className="text-xs">Foto {i + 1}</p>
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
 
@@ -301,7 +354,7 @@ export default function BuildingDetailPage() {
                     <div className="space-y-3 mb-6">
                       <h4 className="font-medium text-gray-900 mb-3">Distribución de calificaciones</h4>
                       {[5, 4, 3, 2, 1].map((star) => {
-                        const count = reviews.filter(r => r.rating === star).length
+                        const count = reviews.filter(r => r.overall_rating === star).length
                         const percentage = reviews.length > 0 ? (count / reviews.length) * 100 : 0
                         
                         return (
@@ -425,35 +478,134 @@ export default function BuildingDetailPage() {
               <h2 className="text-2xl font-semibold text-gray-900 mb-4">
                 Acerca de este edificio
               </h2>
-              <div className="space-y-3 text-gray-700">
+              <div className="space-y-4 text-gray-700">
                 <p>
-                  Ubicado en el corazón de {building.neighborhood}, {building.name} ofrece apartamentos modernos con excelentes amenidades y una ubicación privilegiada.
+                  {building.description || `Ubicado en el corazón de ${building.neighborhood}, ${building.name} ofrece apartamentos modernos con excelentes amenidades y una ubicación privilegiada.`}
                 </p>
-                <div className="grid grid-cols-2 gap-4 py-4">
-                  <div className="flex items-center gap-2">
-                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                    <span>Excelente ubicación</span>
+                
+                {/* Building Details */}
+                <div className="bg-gray-50 rounded-lg p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <h4 className="font-semibold text-gray-900 mb-3">Información General</h4>
+                    <div className="space-y-3">
+                      {building.year_built && (
+                        <div className="flex items-center gap-2">
+                          <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                          <span>Construido en {building.year_built}</span>
+                        </div>
+                      )}
+                      {building.developer && (
+                        <div className="flex items-center gap-2">
+                          <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H9m11 0v-5a2 2 0 00-2-2h-2a2 2 0 00-2 2v5m-4 0V9a2 2 0 012-2h2a2 2 0 012 2v12m-6 0h4" />
+                          </svg>
+                          <span>Desarrollado por {building.developer}</span>
+                        </div>
+                      )}
+                      {building.floors && (
+                        <div className="flex items-center gap-2">
+                          <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1v-2zM3 16a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1v-2z" />
+                          </svg>
+                          <span>{building.floors} pisos</span>
+                        </div>
+                      )}
+                      {building.apartments_count && (
+                        <div className="flex items-center gap-2">
+                          <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2 2v0" />
+                          </svg>
+                          <span>{building.apartments_count} apartamentos</span>
+                        </div>
+                      )}
+                      <div className="flex items-center gap-2">
+                        <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        <span>{building.neighborhood}, {building.corregimiento}</span>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                    </svg>
-                    <span>Seguridad 24/7</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M10.5 3L12 2l1.5 1H21l-1 6H4l-1-6h7.5z" />
-                    </svg>
-                    <span>Amenidades</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                    <span>Mantenimiento</span>
+                  
+                  <div>
+                    <h4 className="font-semibold text-gray-900 mb-3">Amenidades</h4>
+                    <div className="grid grid-cols-1 gap-2">
+                      {building.parking && (
+                        <div className="flex items-center gap-2">
+                          <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                          <span>Estacionamiento</span>
+                        </div>
+                      )}
+                      {building.pool && (
+                        <div className="flex items-center gap-2">
+                          <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                          <span>Piscina</span>
+                        </div>
+                      )}
+                      {building.gym && (
+                        <div className="flex items-center gap-2">
+                          <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                          <span>Gimnasio</span>
+                        </div>
+                      )}
+                      {building.security_24_7 && (
+                        <div className="flex items-center gap-2">
+                          <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                          <span>Seguridad 24/7</span>
+                        </div>
+                      )}
+                      {building.elevator && (
+                        <div className="flex items-center gap-2">
+                          <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                          <span>Ascensor</span>
+                        </div>
+                      )}
+                      {building.balcony && (
+                        <div className="flex items-center gap-2">
+                          <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                          <span>Balcón</span>
+                        </div>
+                      )}
+                      {building.playground && (
+                        <div className="flex items-center gap-2">
+                          <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                          <span>Área de Juegos</span>
+                        </div>
+                      )}
+                      {building.social_area && (
+                        <div className="flex items-center gap-2">
+                          <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                          <span>Área Social</span>
+                        </div>
+                      )}
+                      {building.concierge && (
+                        <div className="flex items-center gap-2">
+                          <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                          <span>Conserjería</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -522,7 +674,7 @@ export default function BuildingDetailPage() {
                             </div>
                             
                             <div className="flex items-center mb-3">
-                              {renderStars(review.rating)}
+                              {renderStars(review.overall_rating)}
                             </div>
                             
                             {/* Título del review si existe */}

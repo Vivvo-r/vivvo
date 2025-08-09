@@ -9,9 +9,12 @@ import { supabase } from '@/lib/supabase'
 
 export default function SuggestBuildingPage() {
   const [formData, setFormData] = useState({
-    name: '',
-    location: '',
-    email: ''
+    building_name: '',
+    building_address: '',
+    neighborhood: '',
+    submitter_email: '',
+    submitter_name: '',
+    additional_info: ''
   })
 
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -26,9 +29,13 @@ export default function SuggestBuildingPage() {
       const { error } = await supabase
         .from('building_suggestions')
         .insert({
-          name: formData.name,
-          location: formData.location,
-          email: formData.email
+          building_name: formData.building_name,
+          building_address: formData.building_address,
+          neighborhood: formData.neighborhood,
+          submitter_email: formData.submitter_email,
+          submitter_name: formData.submitter_name || null,
+          additional_info: formData.additional_info || null,
+          status: 'pending'
         })
 
       if (error) throw error
@@ -43,7 +50,7 @@ export default function SuggestBuildingPage() {
     }
   }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({
       ...prev,
@@ -51,12 +58,12 @@ export default function SuggestBuildingPage() {
     }))
   }
 
-  const isValid = formData.name.trim() && formData.location.trim() && formData.email.includes('@')
+  const isValid = formData.building_name.trim() && formData.building_address.trim() && formData.neighborhood.trim() && formData.submitter_email.includes('@')
 
   if (isSubmitted) {
     return (
       <>
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 pixel-background">
         <Header />
         <div className="max-w-lg mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="bg-white rounded-lg p-8 text-center shadow-sm">
@@ -67,7 +74,7 @@ export default function SuggestBuildingPage() {
             </div>
             <h1 className="text-2xl font-bold text-gray-900 mb-4">¡Sugerencia enviada!</h1>
             <p className="text-gray-600 mb-6">
-              Gracias por ayudarnos a crecer. Revisaremos <strong>{formData.name}</strong> y lo agregaremos pronto a la plataforma.
+              Gracias por ayudarnos a crecer. Revisaremos <strong>{formData.building_name}</strong> y lo agregaremos pronto a la plataforma.
             </p>
             <div className="flex gap-4 justify-center">
               <Link
@@ -79,7 +86,7 @@ export default function SuggestBuildingPage() {
               <button
                 onClick={() => {
                   setIsSubmitted(false)
-                  setFormData({ name: '', location: '', email: '' })
+                  setFormData({ building_name: '', building_address: '', neighborhood: '', submitter_email: '', submitter_name: '', additional_info: '' })
                 }}
                 className="px-6 py-3 text-gray-700 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition-colors"
               >
@@ -97,7 +104,7 @@ export default function SuggestBuildingPage() {
 
   return (
     <>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 pixel-background">
       <Header />
       
       <div className="max-w-lg mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -113,14 +120,14 @@ export default function SuggestBuildingPage() {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="building_name" className="block text-sm font-medium text-gray-700 mb-2">
                 Nombre del edificio *
               </label>
               <input
                 type="text"
-                id="name"
-                name="name"
-                value={formData.name}
+                id="building_name"
+                name="building_name"
+                value={formData.building_name}
                 onChange={handleChange}
                 placeholder="Ej: Torre del Mar, Ocean View, Sortis Hotel..."
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -129,14 +136,30 @@ export default function SuggestBuildingPage() {
             </div>
 
             <div>
-              <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-2">
-                Ubicación *
+              <label htmlFor="building_address" className="block text-sm font-medium text-gray-700 mb-2">
+                Dirección *
               </label>
               <input
                 type="text"
-                id="location"
-                name="location"
-                value={formData.location}
+                id="building_address"
+                name="building_address"
+                value={formData.building_address}
+                onChange={handleChange}
+                placeholder="Ej: Av. Balboa, Calle 50, Via Israel..."
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                required
+              />
+            </div>
+
+            <div>
+              <label htmlFor="neighborhood" className="block text-sm font-medium text-gray-700 mb-2">
+                Barrio *
+              </label>
+              <input
+                type="text"
+                id="neighborhood"
+                name="neighborhood"
+                value={formData.neighborhood}
                 onChange={handleChange}
                 placeholder="Ej: Costa del Este, Punta Pacifica, San Francisco..."
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -145,14 +168,29 @@ export default function SuggestBuildingPage() {
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="submitter_name" className="block text-sm font-medium text-gray-700 mb-2">
+                Tu nombre (opcional)
+              </label>
+              <input
+                type="text"
+                id="submitter_name"
+                name="submitter_name"
+                value={formData.submitter_name}
+                onChange={handleChange}
+                placeholder="Tu nombre"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="submitter_email" className="block text-sm font-medium text-gray-700 mb-2">
                 Tu email *
               </label>
               <input
                 type="email"
-                id="email"
-                name="email"
-                value={formData.email}
+                id="submitter_email"
+                name="submitter_email"
+                value={formData.submitter_email}
                 onChange={handleChange}
                 placeholder="tu@email.com"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -161,6 +199,21 @@ export default function SuggestBuildingPage() {
               <p className="text-sm text-gray-500 mt-1">
                 Para notificarte cuando agreguemos el edificio
               </p>
+            </div>
+
+            <div>
+              <label htmlFor="additional_info" className="block text-sm font-medium text-gray-700 mb-2">
+                Información adicional (opcional)
+              </label>
+              <textarea
+                id="additional_info"
+                name="additional_info"
+                value={formData.additional_info}
+                onChange={handleChange}
+                placeholder="Cualquier información adicional que pueda ser útil..."
+                rows={3}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
             </div>
 
             <button

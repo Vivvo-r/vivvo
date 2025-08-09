@@ -24,3 +24,299 @@ body {
   color: var(--foreground);
   font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
 }
+
+/* Custom animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom shadows */
+.shadow-glow {
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+}
+
+/* Focus states */
+.focus-ring {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 1), 0 0 0 4px rgba(59, 130, 246, 0.2);
+}
+
+/* Loading animations */
+.loading-shimmer {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Line clamp utilities */
+.line-clamp-1 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+}
+
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+.line-clamp-3 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 2.5rem !important;
+    line-height: 1.2 !important;
+  }
+  
+  .hero-subtitle {
+    font-size: 1.125rem !important;
+  }
+  
+  .search-input {
+    font-size: 16px !important; /* Prevents zoom on iOS */
+  }
+  
+  .building-card {
+    margin-bottom: 1rem;
+  }
+  
+  .mobile-padding {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+}
+
+/* Touch-friendly buttons */
+@media (hover: none) and (pointer: coarse) {
+  .touch-button {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Pixelated building styles */
+.pixel-building {
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+  filter: contrast(1.25) brightness(0.85);
+  border-radius: 0;
+  box-shadow: 0 0 0 0.5px rgba(107, 114, 128, 0.25);
+}
+
+.pixel-pattern {
+  background-image: 
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 2px,
+      rgba(107, 114, 128, 0.1) 2px,
+      rgba(107, 114, 128, 0.1) 4px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(107, 114, 128, 0.1) 2px,
+      rgba(107, 114, 128, 0.1) 4px
+    );
+}
+
+.pixel-background {
+  background-image: 
+    radial-gradient(circle at 25% 25%, rgba(107, 114, 128, 0.03) 1px, transparent 1px),
+    radial-gradient(circle at 75% 25%, rgba(107, 114, 128, 0.03) 1px, transparent 1px),
+    radial-gradient(circle at 25% 75%, rgba(107, 114, 128, 0.03) 1px, transparent 1px),
+    radial-gradient(circle at 75% 75%, rgba(107, 114, 128, 0.03) 1px, transparent 1px);
+  background-size: 8px 8px;
+  background-position: 0 0, 0 0, 0 0, 0 0;
+}
+
+/* Pixel Art City Skyline - Dense urban style */
+.pixel-city {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0.08;
+}
+
+.pixel-city::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 200%;
+  height: 350px;
+  background-color: #1f2937;
+  background-image: 
+    /* Row 1 - Tallest buildings */
+    linear-gradient(to top, #111827 0%, #111827 100%) 0 0 / 8px 320px,
+    linear-gradient(to top, #1f2937 0%, #1f2937 100%) 8px 0 / 12px 300px,
+    linear-gradient(to top, #111827 0%, #111827 100%) 20px 0 / 6px 280px,
+    linear-gradient(to top, #1f2937 0%, #1f2937 100%) 26px 0 / 10px 340px,
+    linear-gradient(to top, #111827 0%, #111827 100%) 36px 0 / 14px 310px,
+    linear-gradient(to top, #1f2937 0%, #1f2937 100%) 50px 0 / 8px 290px,
+    linear-gradient(to top, #111827 0%, #111827 100%) 58px 0 / 16px 330px,
+    linear-gradient(to top, #1f2937 0%, #1f2937 100%) 74px 0 / 6px 270px,
+    linear-gradient(to top, #111827 0%, #111827 100%) 80px 0 / 12px 350px,
+    linear-gradient(to top, #1f2937 0%, #1f2937 100%) 92px 0 / 10px 300px,
+    linear-gradient(to top, #111827 0%, #111827 100%) 102px 0 / 8px 280px,
+    linear-gradient(to top, #1f2937 0%, #1f2937 100%) 110px 0 / 18px 320px,
+    linear-gradient(to top, #111827 0%, #111827 100%) 128px 0 / 6px 290px,
+    linear-gradient(to top, #1f2937 0%, #1f2937 100%) 134px 0 / 14px 310px,
+    linear-gradient(to top, #111827 0%, #111827 100%) 148px 0 / 12px 270px,
+    linear-gradient(to top, #1f2937 0%, #1f2937 100%) 160px 0 / 8px 340px,
+    linear-gradient(to top, #111827 0%, #111827 100%) 168px 0 / 16px 300px,
+    linear-gradient(to top, #1f2937 0%, #1f2937 100%) 184px 0 / 10px 280px,
+    linear-gradient(to top, #111827 0%, #111827 100%) 194px 0 / 6px 330px,
+    linear-gradient(to top, #1f2937 0%, #1f2937 100%) 200px 0 / 12px 290px,
+    
+    /* Row 2 - Medium buildings */
+    linear-gradient(to top, #374151 0%, #374151 100%) 0 0 / 10px 220px,
+    linear-gradient(to top, #4b5563 0%, #4b5563 100%) 10px 0 / 8px 200px,
+    linear-gradient(to top, #374151 0%, #374151 100%) 18px 0 / 12px 240px,
+    linear-gradient(to top, #4b5563 0%, #4b5563 100%) 30px 0 / 6px 180px,
+    linear-gradient(to top, #374151 0%, #374151 100%) 36px 0 / 14px 260px,
+    linear-gradient(to top, #4b5563 0%, #4b5563 100%) 50px 0 / 8px 190px,
+    linear-gradient(to top, #374151 0%, #374151 100%) 58px 0 / 10px 230px,
+    linear-gradient(to top, #4b5563 0%, #4b5563 100%) 68px 0 / 16px 210px,
+    linear-gradient(to top, #374151 0%, #374151 100%) 84px 0 / 6px 170px,
+    linear-gradient(to top, #4b5563 0%, #4b5563 100%) 90px 0 / 12px 250px,
+    linear-gradient(to top, #374151 0%, #374151 100%) 102px 0 / 8px 200px,
+    linear-gradient(to top, #4b5563 0%, #4b5563 100%) 110px 0 / 14px 220px,
+    linear-gradient(to top, #374151 0%, #374151 100%) 124px 0 / 10px 180px,
+    linear-gradient(to top, #4b5563 0%, #4b5563 100%) 134px 0 / 6px 240px,
+    linear-gradient(to top, #374151 0%, #374151 100%) 140px 0 / 16px 190px,
+    linear-gradient(to top, #4b5563 0%, #4b5563 100%) 156px 0 / 8px 210px,
+    linear-gradient(to top, #374151 0%, #374151 100%) 164px 0 / 12px 260px,
+    linear-gradient(to top, #4b5563 0%, #4b5563 100%) 176px 0 / 10px 200px,
+    linear-gradient(to top, #374151 0%, #374151 100%) 186px 0 / 14px 180px,
+    linear-gradient(to top, #4b5563 0%, #4b5563 100%) 200px 0 / 6px 230px,
+    
+    /* Row 3 - Lower buildings */
+    linear-gradient(to top, #6b7280 0%, #6b7280 100%) 0 0 / 12px 120px,
+    linear-gradient(to top, #9ca3af 0%, #9ca3af 100%) 12px 0 / 8px 100px,
+    linear-gradient(to top, #6b7280 0%, #6b7280 100%) 20px 0 / 10px 140px,
+    linear-gradient(to top, #9ca3af 0%, #9ca3af 100%) 30px 0 / 6px 80px,
+    linear-gradient(to top, #6b7280 0%, #6b7280 100%) 36px 0 / 14px 160px,
+    linear-gradient(to top, #9ca3af 0%, #9ca3af 100%) 50px 0 / 8px 90px,
+    linear-gradient(to top, #6b7280 0%, #6b7280 100%) 58px 0 / 16px 130px,
+    linear-gradient(to top, #9ca3af 0%, #9ca3af 100%) 74px 0 / 6px 110px,
+    linear-gradient(to top, #6b7280 0%, #6b7280 100%) 80px 0 / 12px 150px,
+    linear-gradient(to top, #9ca3af 0%, #9ca3af 100%) 92px 0 / 10px 70px,
+    linear-gradient(to top, #6b7280 0%, #6b7280 100%) 102px 0 / 8px 120px,
+    linear-gradient(to top, #9ca3af 0%, #9ca3af 100%) 110px 0 / 14px 100px,
+    linear-gradient(to top, #6b7280 0%, #6b7280 100%) 124px 0 / 6px 140px,
+    linear-gradient(to top, #9ca3af 0%, #9ca3af 100%) 130px 0 / 10px 80px,
+    linear-gradient(to top, #6b7280 0%, #6b7280 100%) 140px 0 / 16px 160px,
+    linear-gradient(to top, #9ca3af 0%, #9ca3af 100%) 156px 0 / 8px 90px,
+    linear-gradient(to top, #6b7280 0%, #6b7280 100%) 164px 0 / 12px 130px,
+    linear-gradient(to top, #9ca3af 0%, #9ca3af 100%) 176px 0 / 6px 110px,
+    linear-gradient(to top, #6b7280 0%, #6b7280 100%) 182px 0 / 14px 150px,
+    linear-gradient(to top, #9ca3af 0%, #9ca3af 100%) 196px 0 / 10px 70px,
+    
+    /* Windows - Illuminated squares scattered throughout */
+    /* Tall buildings windows */
+    linear-gradient(to top, #fbbf24 0%, #fbbf24 100%) 2px 40px / 2px 3px,
+    linear-gradient(to top, #fbbf24 0%, #fbbf24 100%) 2px 60px / 2px 3px,
+    linear-gradient(to top, #fbbf24 0%, #fbbf24 100%) 2px 80px / 2px 3px,
+    linear-gradient(to top, #fbbf24 0%, #fbbf24 100%) 10px 50px / 2px 3px,
+    linear-gradient(to top, #fbbf24 0%, #fbbf24 100%) 10px 70px / 2px 3px,
+    linear-gradient(to top, #fbbf24 0%, #fbbf24 100%) 22px 45px / 2px 3px,
+    linear-gradient(to top, #fbbf24 0%, #fbbf24 100%) 22px 65px / 2px 3px,
+    linear-gradient(to top, #fbbf24 0%, #fbbf24 100%) 30px 55px / 2px 3px,
+    linear-gradient(to top, #fbbf24 0%, #fbbf24 100%) 30px 85px / 2px 3px,
+    linear-gradient(to top, #fbbf24 0%, #fbbf24 100%) 40px 35px / 2px 3px,
+    linear-gradient(to top, #fbbf24 0%, #fbbf24 100%) 40px 75px / 2px 3px,
+    linear-gradient(to top, #fbbf24 0%, #fbbf24 100%) 52px 40px / 2px 3px,
+    linear-gradient(to top, #fbbf24 0%, #fbbf24 100%) 52px 80px / 2px 3px,
+    linear-gradient(to top, #fbbf24 0%, #fbbf24 100%) 60px 45px / 2px 3px,
+    linear-gradient(to top, #fbbf24 0%, #fbbf24 100%) 60px 65px / 2px 3px,
+    linear-gradient(to top, #fbbf24 0%, #fbbf24 100%) 78px 50px / 2px 3px,
+    linear-gradient(to top, #fbbf24 0%, #fbbf24 100%) 78px 90px / 2px 3px,
+    linear-gradient(to top, #fbbf24 0%, #fbbf24 100%) 84px 35px / 2px 3px,
+    linear-gradient(to top, #fbbf24 0%, #fbbf24 100%) 84px 75px / 2px 3px,
+    linear-gradient(to top, #fbbf24 0%, #fbbf24 100%) 96px 55px / 2px 3px,
+    linear-gradient(to top, #fbbf24 0%, #fbbf24 100%) 96px 85px / 2px 3px,
+    
+    /* Medium buildings windows */
+    linear-gradient(to top, #f59e0b 0%, #f59e0b 100%) 4px 25px / 2px 2px,
+    linear-gradient(to top, #f59e0b 0%, #f59e0b 100%) 14px 30px / 2px 2px,
+    linear-gradient(to top, #f59e0b 0%, #f59e0b 100%) 24px 35px / 2px 2px,
+    linear-gradient(to top, #f59e0b 0%, #f59e0b 100%) 32px 20px / 2px 2px,
+    linear-gradient(to top, #f59e0b 0%, #f59e0b 100%) 42px 40px / 2px 2px,
+    linear-gradient(to top, #f59e0b 0%, #f59e0b 100%) 54px 25px / 2px 2px,
+    linear-gradient(to top, #f59e0b 0%, #f59e0b 100%) 64px 35px / 2px 2px,
+    linear-gradient(to top, #f59e0b 0%, #f59e0b 100%) 76px 30px / 2px 2px,
+    linear-gradient(to top, #f59e0b 0%, #f59e0b 100%) 86px 20px / 2px 2px,
+    linear-gradient(to top, #f59e0b 0%, #f59e0b 100%) 94px 40px / 2px 2px,
+    
+    /* Antennas and roof details */
+    linear-gradient(to top, #ef4444 0%, #ef4444 100%) 4px 320px / 1px 8px,
+    linear-gradient(to top, #ef4444 0%, #ef4444 100%) 14px 300px / 1px 6px,
+    linear-gradient(to top, #ef4444 0%, #ef4444 100%) 30px 340px / 1px 10px,
+    linear-gradient(to top, #ef4444 0%, #ef4444 100%) 44px 310px / 1px 7px,
+    linear-gradient(to top, #ef4444 0%, #ef4444 100%) 62px 330px / 1px 9px,
+    linear-gradient(to top, #ef4444 0%, #ef4444 100%) 84px 350px / 1px 12px,
+    linear-gradient(to top, #ef4444 0%, #ef4444 100%) 118px 320px / 1px 8px,
+    linear-gradient(to top, #ef4444 0%, #ef4444 100%) 172px 300px / 1px 6px;
+  
+  background-repeat: repeat-x;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}

@@ -67,7 +67,7 @@ export default function LoginPage() {
 
   return (
     <>
-      <div className="min-h-screen bg-gray-50 flex">
+      <div className="min-h-screen bg-gray-50 pixel-background flex">
       {/* Left Column - Benefits */}
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-600 to-blue-800 p-12 items-center">
         <div className="max-w-md text-white">

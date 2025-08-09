@@ -23,7 +23,7 @@ export default function AboutPage() {
         <link rel="canonical" href="https://vivvo.com/about" />
       </Head>
       
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-gray-50 pixel-background">
         <Header />
         
         {/* Hero Section */}

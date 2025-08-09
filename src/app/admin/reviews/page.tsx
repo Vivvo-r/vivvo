@@ -80,8 +80,8 @@ export default function AdminReviewsPage() {
       oneWeekAgo.setDate(oneWeekAgo.getDate() - 7)
       return new Date(review.created_at || '') > oneWeekAgo
     }
-    if (filter === 'high') return review.rating >= 4
-    if (filter === 'low') return review.rating <= 2
+    if (filter === 'high') return review.overall_rating >= 4
+    if (filter === 'low') return review.overall_rating <= 2
     return true
   })
 
@@ -154,7 +154,7 @@ export default function AdminReviewsPage() {
             <div className="flex items-center">
               <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
                 <span className="text-green-600 font-semibold text-lg">
-                  {reviews.filter(r => r.rating >= 4).length}
+                  {reviews.filter(r => r.overall_rating >= 4).length}
                 </span>
               </div>
               <div className="ml-3">
@@ -167,7 +167,7 @@ export default function AdminReviewsPage() {
             <div className="flex items-center">
               <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
                 <span className="text-yellow-600 font-semibold text-lg">
-                  {reviews.filter(r => r.rating === 3).length}
+                  {reviews.filter(r => r.overall_rating === 3).length}
                 </span>
               </div>
               <div className="ml-3">
@@ -180,7 +180,7 @@ export default function AdminReviewsPage() {
             <div className="flex items-center">
               <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
                 <span className="text-red-600 font-semibold text-lg">
-                  {reviews.filter(r => r.rating <= 2).length}
+                  {reviews.filter(r => r.overall_rating <= 2).length}
                 </span>
               </div>
               <div className="ml-3">
@@ -249,10 +249,10 @@ export default function AdminReviewsPage() {
                       {/* Rating */}
                       <div className="flex items-center mb-3">
                         <div className="flex items-center mr-3">
-                          {renderStars(review.rating)}
+                          {renderStars(review.overall_rating)}
                         </div>
                         <span className="font-semibold text-gray-900">
-                          {review.rating}/5
+                          {review.overall_rating}/5
                         </span>
                       </div>
 

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { VIVVO } from "@/lib/constants";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { AdminProvider } from "@/contexts/AdminContext";
 
@@ -16,12 +15,23 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: `${VIVVO.name} - ${VIVVO.tagline}`,
-  description: VIVVO.description,
-  keywords: ['apartamentos', 'panama', 'reviews', 'alquiler', 'vivir'],
+  title: 'Vivvo - Reseñas reales de apartamentos en Panamá',
+  description: 'Encuentra reseñas reales de inquilinos reales sobre edificios de apartamentos en Panamá. Más de 500 reseñas auténticas para ayudarte a tomar la mejor decisión.',
+  keywords: ['apartamentos panama', 'reseñas edificios panama', 'alquiler panama', 'torre del mar', 'costa del este', 'punta pacifica', 'san francisco', 'vivir en panama'],
   authors: [{ name: 'Vivvo Team' }],
   creator: 'Vivvo',
   publisher: 'Vivvo',
+  openGraph: {
+    title: 'Vivvo - Reseñas reales de apartamentos en Panamá',
+    description: 'Encuentra reseñas reales de inquilinos verificados sobre edificios de apartamentos en Panamá. Más de 500 reseñas auténticas.',
+    type: 'website',
+    url: 'https://vivvo.com',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Vivvo - Reseñas reales de apartamentos en Panamá',
+    description: 'Encuentra reseñas reales de inquilinos reales sobre edificios de apartamentos en Panamá.',
+  },
   formatDetection: {
     email: false,
     address: false,
@@ -39,6 +49,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <div className="pixel-city"></div>
         <AuthProvider>
           <AdminProvider>
             {children}

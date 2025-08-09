@@ -19,19 +19,27 @@ export default function AdminBuildingsPage() {
   const [formData, setFormData] = useState({
     name: '',
     address: '',
-    neighborhood: '',
     corregimiento: '',
     description: '',
     year_built: '',
     floors: '',
     apartments_count: '',
+    developer: '',
+    main_photo: '',
     parking: false,
     pool: false,
     gym: false,
     security_24_7: false,
     elevator: false,
-    balcony: false
+    balcony: false,
+    playground: false,
+    social_area: false,
+    concierge: false,
+    elevator_count: '',
+    pool_count: ''
   })
+  const [photos, setPhotos] = useState<string[]>([])
+  const [newPhotoUrl, setNewPhotoUrl] = useState('')
 
   useEffect(() => {
     if (!authLoading && !isAdmin) {
@@ -91,19 +99,30 @@ export default function AdminBuildingsPage() {
         name: formData.name,
         slug,
         address: formData.address,
-        neighborhood: formData.neighborhood,
         corregimiento: formData.corregimiento,
         description: formData.description || null,
         year_built: formData.year_built ? parseInt(formData.year_built) : null,
         floors: formData.floors ? parseInt(formData.floors) : null,
         apartments_count: formData.apartments_count ? parseInt(formData.apartments_count) : null,
+        developer: formData.developer || null,
+        main_photo: formData.main_photo || null,
+        photos: photos.length > 0 ? photos : null,
         parking: formData.parking,
         pool: formData.pool,
         gym: formData.gym,
         security_24_7: formData.security_24_7,
         elevator: formData.elevator,
-        balcony: formData.balcony
+        balcony: formData.balcony,
+        playground: formData.playground,
+        social_area: formData.social_area,
+        concierge: formData.concierge,
+        // New count fields
+        elevator_count: formData.elevator_count ? parseInt(formData.elevator_count) : null,
+        pool_count: formData.pool_count ? parseInt(formData.pool_count) : null
       }
+
+      console.log('Building data to be saved:', buildingData)
+      console.log('Form data:', formData)
 
       if (editingBuilding) {
         // Update existing building
@@ -136,19 +155,27 @@ export default function AdminBuildingsPage() {
         setFormData({
           name: '',
           address: '',
-          neighborhood: '',
           corregimiento: '',
           description: '',
           year_built: '',
           floors: '',
           apartments_count: '',
+          developer: '',
+          main_photo: '',
           parking: false,
           pool: false,
           gym: false,
           security_24_7: false,
           elevator: false,
-          balcony: false
+          balcony: false,
+          playground: false,
+          social_area: false,
+          concierge: false,
+          elevator_count: '',
+          pool_count: ''
         })
+        setPhotos([])
+        setNewPhotoUrl('')
         setEditingBuilding(null)
         setShowForm(false)
         return
@@ -158,25 +185,41 @@ export default function AdminBuildingsPage() {
       setFormData({
         name: '',
         address: '',
-        neighborhood: '',
         corregimiento: '',
         description: '',
         year_built: '',
         floors: '',
         apartments_count: '',
+        developer: '',
+        main_photo: '',
         parking: false,
         pool: false,
         gym: false,
         security_24_7: false,
         elevator: false,
-        balcony: false
+        balcony: false,
+        playground: false,
+        social_area: false,
+        concierge: false,
+        elevator_count: '',
+        pool_count: ''
       })
+      setPhotos([])
+      setNewPhotoUrl('')
       setEditingBuilding(null)
       setShowForm(false)
       
     } catch (error) {
       console.error('Error saving building:', error)
-      alert('Error al guardar el edificio')
+      
+      // Show detailed error information
+      if (error && typeof error === 'object' && 'message' in error) {
+        console.error('Supabase error details:', error)
+        alert(`Error al guardar el edificio: ${error.message}`)
+      } else {
+        console.error('Unknown error:', error)
+        alert('Error desconocido al guardar el edificio')
+      }
     }
   }
 
@@ -187,19 +230,27 @@ export default function AdminBuildingsPage() {
     setFormData({
       name: building.name,
       address: building.address,
-      neighborhood: building.neighborhood,
       corregimiento: building.corregimiento,
       description: building.description || '',
       year_built: building.year_built?.toString() || '',
       floors: building.floors?.toString() || '',
       apartments_count: building.apartments_count?.toString() || '',
+      developer: building.developer || '',
+      main_photo: building.main_photo || '',
       parking: building.parking || false,
       pool: building.pool || false,
       gym: building.gym || false,
       security_24_7: building.security_24_7 || false,
       elevator: building.elevator || false,
-      balcony: building.balcony || false
+      balcony: building.balcony || false,
+      playground: building.playground || false,
+      social_area: building.social_area || false,
+      concierge: building.concierge || false,
+      elevator_count: building.elevator_count?.toString() || '',
+      pool_count: building.pool_count?.toString() || ''
     })
+    setPhotos(building.photos || [])
+    setNewPhotoUrl('')
     
     setShowForm(true)
   }
@@ -230,6 +281,24 @@ export default function AdminBuildingsPage() {
     } else {
       setFormData(prev => ({ ...prev, [name]: value }))
     }
+  }
+
+  const addPhoto = () => {
+    if (newPhotoUrl.trim() && !photos.includes(newPhotoUrl.trim())) {
+      setPhotos(prev => [...prev, newPhotoUrl.trim()])
+      setNewPhotoUrl('')
+    }
+  }
+
+  const removePhoto = (url: string) => {
+    setPhotos(prev => prev.filter(photo => photo !== url))
+    if (formData.main_photo === url) {
+      setFormData(prev => ({ ...prev, main_photo: '' }))
+    }
+  }
+
+  const setAsMainPhoto = (url: string) => {
+    setFormData(prev => ({ ...prev, main_photo: url }))
   }
 
   if (authLoading || loading) {
@@ -271,18 +340,24 @@ export default function AdminBuildingsPage() {
                 setFormData({
                   name: '',
                   address: '',
-                  neighborhood: '',
                   corregimiento: '',
                   description: '',
                   year_built: '',
                   floors: '',
                   apartments_count: '',
+                  developer: '',
+                  main_photo: '',
                   parking: false,
                   pool: false,
                   gym: false,
                   security_24_7: false,
                   elevator: false,
-                  balcony: false
+                  balcony: false,
+                  playground: false,
+                  social_area: false,
+                  concierge: false,
+                  elevator_count: '',
+                  pool_count: ''
                 })
               }}
               className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
@@ -316,18 +391,24 @@ export default function AdminBuildingsPage() {
                     setFormData({
                       name: '',
                       address: '',
-                      neighborhood: '',
                       corregimiento: '',
                       description: '',
                       year_built: '',
                       floors: '',
                       apartments_count: '',
+                      developer: '',
+                      main_photo: '',
                       parking: false,
                       pool: false,
                       gym: false,
                       security_24_7: false,
                       elevator: false,
-                      balcony: false
+                      balcony: false,
+                      playground: false,
+                      social_area: false,
+                      concierge: false,
+                      elevator_count: '',
+                      pool_count: ''
                     })
                   }}
                   className="text-gray-500 hover:text-gray-700"
@@ -366,19 +447,6 @@ export default function AdminBuildingsPage() {
                     />
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Barrio *
-                    </label>
-                    <input
-                      type="text"
-                      name="neighborhood"
-                      value={formData.neighborhood}
-                      onChange={handleChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      required
-                    />
-                  </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -402,6 +470,20 @@ export default function AdminBuildingsPage() {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Constructora/Desarrollador
+                    </label>
+                    <input
+                      type="text"
+                      name="developer"
+                      value={formData.developer}
+                      onChange={handleChange}
+                      placeholder="Ej: Corporación La Prensa"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
                       Año de Construcción
                     </label>
                     <input
@@ -409,6 +491,8 @@ export default function AdminBuildingsPage() {
                       name="year_built"
                       value={formData.year_built}
                       onChange={handleChange}
+                      min="1950"
+                      max="2030"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
@@ -452,6 +536,92 @@ export default function AdminBuildingsPage() {
                     />
                   </div>
 
+                  {/* Photo Management Section */}
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Gestión de Fotos
+                    </label>
+                    
+                    {/* Add Photo */}
+                    <div className="flex gap-2 mb-3">
+                      <input
+                        type="url"
+                        value={newPhotoUrl}
+                        onChange={(e) => setNewPhotoUrl(e.target.value)}
+                        placeholder="URL de la foto (https://...)"
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                      <button
+                        type="button"
+                        onClick={addPhoto}
+                        className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                      >
+                        Agregar
+                      </button>
+                    </div>
+
+                    {/* Main Photo Selection */}
+                    {photos.length > 0 && (
+                      <div className="mb-3">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Foto Principal
+                        </label>
+                        <select
+                          name="main_photo"
+                          value={formData.main_photo}
+                          onChange={handleChange}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                          <option value="">Seleccionar foto principal...</option>
+                          {photos.map((photo, index) => (
+                            <option key={index} value={photo}>
+                              Foto {index + 1}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+
+                    {/* Photos List */}
+                    {photos.length > 0 && (
+                      <div className="space-y-2">
+                        <p className="text-sm text-gray-600">Fotos agregadas ({photos.length}):</p>
+                        <div className="max-h-32 overflow-y-auto space-y-1">
+                          {photos.map((photo, index) => (
+                            <div key={index} className="flex items-center justify-between bg-gray-50 px-3 py-2 rounded">
+                              <div className="flex items-center space-x-2">
+                                <span className="text-sm text-gray-700">Foto {index + 1}</span>
+                                {formData.main_photo === photo && (
+                                  <span className="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded">Principal</span>
+                                )}
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <button
+                                  type="button"
+                                  onClick={() => setAsMainPhoto(photo)}
+                                  className="text-xs text-blue-600 hover:text-blue-800"
+                                >
+                                  Principal
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => removePhoto(photo)}
+                                  className="text-red-600 hover:text-red-800 text-sm"
+                                >
+                                  ✕
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {photos.length === 0 && (
+                      <p className="text-sm text-gray-500 italic">No hay fotos agregadas. Agrega URLs de fotos para mostrar en el edificio.</p>
+                    )}
+                  </div>
+
                   <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Amenidades
@@ -463,7 +633,10 @@ export default function AdminBuildingsPage() {
                         { key: 'gym', label: 'Gimnasio' },
                         { key: 'security_24_7', label: 'Seguridad 24/7' },
                         { key: 'elevator', label: 'Ascensor' },
-                        { key: 'balcony', label: 'Balcón' }
+                        { key: 'balcony', label: 'Balcón' },
+                        { key: 'playground', label: 'Área de Juegos' },
+                        { key: 'social_area', label: 'Área Social' },
+                        { key: 'concierge', label: 'Conserjería' }
                       ].map(amenity => (
                         <label key={amenity.key} className="flex items-center space-x-2">
                           <input
@@ -479,6 +652,36 @@ export default function AdminBuildingsPage() {
                     </div>
                   </div>
 
+                  {/* Count Fields */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Cantidad de Ascensores
+                    </label>
+                    <input
+                      type="number"
+                      name="elevator_count"
+                      value={formData.elevator_count}
+                      onChange={handleChange}
+                      min="0"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="Ej: 2"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Cantidad de Piscinas
+                    </label>
+                    <input
+                      type="number"
+                      name="pool_count"
+                      value={formData.pool_count}
+                      onChange={handleChange}
+                      min="0"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="Ej: 1"
+                    />
+                  </div>
 
                 </div>
 
@@ -491,18 +694,24 @@ export default function AdminBuildingsPage() {
                       setFormData({
                         name: '',
                         address: '',
-                        neighborhood: '',
                         corregimiento: '',
                         description: '',
                         year_built: '',
                         floors: '',
                         apartments_count: '',
+                        developer: '',
+                        main_photo: '',
                         parking: false,
                         pool: false,
                         gym: false,
                         security_24_7: false,
                         elevator: false,
-                        balcony: false
+                        balcony: false,
+                        playground: false,
+                        social_area: false,
+                        concierge: false,
+                        elevator_count: '',
+                        pool_count: ''
                       })
                     }}
                     className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
@@ -570,7 +779,7 @@ export default function AdminBuildingsPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-900">{building.corregimiento}</div>
-                        <div className="text-sm text-gray-500">{building.neighborhood}</div>
+                        <div className="text-sm text-gray-500">{building.address}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex flex-wrap gap-1">
