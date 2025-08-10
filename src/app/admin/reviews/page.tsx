@@ -242,7 +242,7 @@ export default function AdminReviewsPage() {
                             {review.building.name}
                           </Link>
                           <span className="text-gray-500">•</span>
-                          <span className="text-sm text-gray-600">{review.building.neighborhood}</span>
+                          <span className="text-sm text-gray-600">{review.building.corregimiento}</span>
                         </div>
                       </div>
 

@@ -292,7 +292,7 @@ export default function WriteReviewPage() {
                     {building.name}
                   </h2>
                   <p className="text-gray-600">
-                    📍 {building.neighborhood} • {building.address}
+                    📍 {building.corregimiento} • {building.address}
                   </p>
                   <p className="text-sm text-blue-700 mt-2">
                     ✨ Tu experiencia ayudará a otros a tomar mejores decisiones

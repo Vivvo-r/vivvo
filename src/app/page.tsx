@@ -251,7 +251,7 @@ export default function Home() {
                     <div className="flex text-yellow-400 text-xs">★★★★★</div>
                   </div>
                 </div>
-                <p className="text-gray-600 text-xs leading-relaxed">"Excelente seguridad y amenidades. La administración responde rápido."</p>
+                <p className="text-gray-600 text-xs leading-relaxed">&ldquo;Excelente seguridad y amenidades. La administración responde rápido.&rdquo;</p>
               </div>
               
               <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100">
@@ -264,7 +264,7 @@ export default function Home() {
                     <div className="flex text-yellow-400 text-xs">★★★★☆</div>
                   </div>
                 </div>
-                <p className="text-gray-600 text-xs leading-relaxed">"Hermosa vista pero el ascensor falla seguido. Ubicación perfecta."</p>
+                <p className="text-gray-600 text-xs leading-relaxed">&ldquo;Hermosa vista pero el ascensor falla seguido. Ubicación perfecta.&rdquo;</p>
               </div>
               
               <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100">
@@ -277,7 +277,7 @@ export default function Home() {
                     <div className="flex text-yellow-400 text-xs">★★★☆☆</div>
                   </div>
                 </div>
-                <p className="text-gray-600 text-xs leading-relaxed">"Amenidades increíbles pero muy caro el mantenimiento mensual."</p>
+                <p className="text-gray-600 text-xs leading-relaxed">&ldquo;Amenidades increíbles pero muy caro el mantenimiento mensual.&rdquo;</p>
               </div>
             </div>
 

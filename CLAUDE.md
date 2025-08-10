@@ -28,10 +28,43 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Search & filtering**: By name, corregimiento (47 districts in Panama City)
 - **Building suggestions**: Users can suggest new buildings for approval
 
-### Database Schema Highlights
-- **Buildings**: Include amenities (pool, gym, parking, etc.) and location data
-- **Reviews**: Comprehensive rating system with 12 detailed categories plus general feedback
-- **Supabase Auth integration**: Uses `auth.users` table for user management
+### Database Schema
+#### Buildings Table
+- `id` (uuid, primary key), `name` (text), `slug` (text, unique), `address` (text)
+- `corregimiento` (text), `distrito` (text), `description` (text)
+- `year_built` (integer), `floors` (integer), `apartments_count` (integer)
+- `amenities` (text[]), `parking` (boolean), `pool` (boolean), `gym` (boolean)
+- `security_24_7` (boolean), `elevator` (boolean), `balcony` (boolean)
+- `elevator_count` (integer), `pool_count` (integer)
+- `created_at`, `updated_at` (timestamps)
+
+#### Reviews Table  
+- `id` (uuid), `building_id` (uuid, FK), `user_id` (uuid, FK to auth.users)
+- `overall_rating` (integer 1-5), `comment` (text), `review_title` (text)
+- `apartment_type` (studio, 1br, 2br, 3br, 4br, penthouse)
+- `monthly_rent_range` (under_500, 500_1000, 1000_1500, 1500_2000, 2000_3000, over_3000)
+- `living_duration_months` (integer), `would_recommend` (boolean)
+- `pros` (text), `cons` (text)
+- **12 detailed ratings** (all integer 1-5): building_condition, security, noise_level, public_transport, shopping_centers, hospitals, gym, administration, maintenance, location, apartment_quality, amenities
+- `created_at`, `updated_at` (timestamps)
+
+#### Corregimientos Table
+- `id` (uuid), `name` (text, unique), `distrito` (text), `active` (boolean), `created_at` (timestamp)
+
+#### Building Suggestions Table  
+- `id` (uuid), `building_name` (text), `building_address` (text), `corregimiento` (text)
+- `submitter_name` (text), `submitter_email` (text), `developer` (text), `year_built` (integer)
+- `additional_info` (text), `status` (pending/reviewing/approved/rejected), `admin_notes` (text)
+- `created_at`, `updated_at` (timestamps)
+
+#### Building Ratings View (Computed)
+- Aggregated ratings per building with averages for all 12 categories plus total reviews count
+- **Security**: Secured with `security_invoker = true` to use querying user's permissions
+
+#### Security & Permissions
+- **RLS enabled** on all tables with public read access
+- **Reviews**: Users can only insert/update their own reviews  
+- **Building suggestions**: Public insert, admin-only updates
 - **Admin credentials**: Hardcoded as admin/vivvo2024 (stored in AdminContext.tsx:14-18)
 
 ### Context Providers

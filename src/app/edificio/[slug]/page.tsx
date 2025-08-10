@@ -236,7 +236,7 @@ export default function BuildingDetailPage() {
                     <span className="text-gray-600">·</span>
                   </>
                 )}
-                <span className="text-gray-700">{building.neighborhood}, Panamá</span>
+                <span className="text-gray-700">{building.corregimiento}, Panamá</span>
               </div>
               
               <p className="text-gray-600">
@@ -480,7 +480,7 @@ export default function BuildingDetailPage() {
               </h2>
               <div className="space-y-4 text-gray-700">
                 <p>
-                  {building.description || `Ubicado en el corazón de ${building.neighborhood}, ${building.name} ofrece apartamentos modernos con excelentes amenidades y una ubicación privilegiada.`}
+                  {building.description || `Ubicado en el corazón de ${building.corregimiento}, ${building.name} ofrece apartamentos modernos con excelentes amenidades y una ubicación privilegiada.`}
                 </p>
                 
                 {/* Building Details */}
@@ -525,7 +525,7 @@ export default function BuildingDetailPage() {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                         </svg>
-                        <span>{building.neighborhood}, {building.corregimiento}</span>
+                        <span>{building.corregimiento}</span>
                       </div>
                     </div>
                   </div>
